@@ -212,22 +212,22 @@ public class bookstore implements ActionListener{
 
 	private void removeItem() 
 	{
-		int                bid;
+		String                upc;
 		PreparedStatement  ps;
 		  
 		try
 		{
-		  ps = con.prepareStatement("DELETE FROM branch WHERE branch_id = ?");
+		  ps = con.prepareStatement("DELETE FROM item WHERE upc = ?");
 		
-		  System.out.print("\nBranch ID: ");
-		  bid = Integer.parseInt(in.readLine());
-		  ps.setInt(1, bid);
+		  System.out.print("\nUpc: ");
+		  upc = in.readLine();
+		  ps.setString(1, upc);
 
 		  int rowCount = ps.executeUpdate();
 
 		  if (rowCount == 0)
 		  {
-		      System.out.println("\nBranch " + bid + " does not exist!");
+		      System.out.println("\nItem " + upc + " does not exist!");
 		  }
 
 		  con.commit();
