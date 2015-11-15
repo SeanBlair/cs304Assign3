@@ -79,8 +79,8 @@ public class bookstore implements ActionListener{
 	    while (!quit)
 	    {
 		System.out.print("\n\nPlease choose one of the following: \n");
-		System.out.print("1.  Insert branch\n");
-		System.out.print("2.  Delete branch\n");
+		System.out.print("1.  Insert Item\n");
+		System.out.print("2.  Remove Item\n");
 		System.out.print("3.  Update branch\n");
 		System.out.print("4.  Show branch\n");
 		System.out.print("5.  Quit\n>> ");
@@ -91,8 +91,8 @@ public class bookstore implements ActionListener{
 
 		switch(choice)
 		{
-		   case 1:  insertBranch(); break;
-		   case 2:  deleteBranch(); break;
+		   case 1:  insertItem(); break;
+		   case 2:  removeItem(); break;
 		   case 3:  updateBranch(); break;
 		   case 4:  showBranch(); break;
 		   case 5:  quit = true;
@@ -125,10 +125,84 @@ public class bookstore implements ActionListener{
     }
 	
 	 private void showBranch() {
-		// TODO Auto-generated method stub
-		 System.out.println("showing branch...");
-		
-	}
+			String     bid;
+			String     bname;
+			String     baddr;
+			String     bcity;
+			String     bphone;
+			Statement  stmt;
+			ResultSet  rs;
+			   
+			try
+			{
+			  stmt = con.createStatement();
+
+			  rs = stmt.executeQuery("SELECT * FROM branch");
+
+			  // get info on ResultSet
+			  ResultSetMetaData rsmd = rs.getMetaData();
+
+			  // get number of columns
+			  int numCols = rsmd.getColumnCount();
+
+			  System.out.println(" ");
+			  
+			  // display column names;
+			  for (int i = 0; i < numCols; i++)
+			  {
+			      // get column name and print it
+
+			      System.out.printf("%-15s", rsmd.getColumnName(i+1));    
+			  }
+
+			  System.out.println(" ");
+
+			  while(rs.next())
+			  {
+			      // for display purposes get everything from Oracle 
+			      // as a string
+
+			      // simplified output formatting; truncation may occur
+
+			      bid = rs.getString("branch_id");
+			      System.out.printf("%-10.10s", bid);
+
+			      bname = rs.getString("branch_name");
+			      System.out.printf("%-20.20s", bname);
+
+			      baddr = rs.getString("branch_addr");
+			      if (rs.wasNull())
+			      {
+			    	  System.out.printf("%-20.20s", " ");
+		              }
+			      else
+			      {
+			    	  System.out.printf("%-20.20s", baddr);
+			      }
+
+			      bcity = rs.getString("branch_city");
+			      System.out.printf("%-15.15s", bcity);
+
+			      bphone = rs.getString("branch_phone");
+			      if (rs.wasNull())
+			      {
+			    	  System.out.printf("%-15.15s\n", " ");
+		              }
+			      else
+			      {
+			    	  System.out.printf("%-15.15s\n", bphone);
+			      }      
+			  }
+		 
+			  // close the statement; 
+			  // the ResultSet will also be closed
+			  stmt.close();
+			}
+			catch (SQLException ex)
+			{
+			    System.out.println("Message: " + ex.getMessage());
+			}	
+		    }
 
 	private void updateBranch() {
 		// TODO Auto-generated method stub
@@ -136,16 +210,87 @@ public class bookstore implements ActionListener{
 		
 	}
 
-	private void deleteBranch() {
+	private void removeItem() {
 		// TODO Auto-generated method stub
 		System.out.println("deleting branch...");
 	}
 
-	private void insertBranch() {
-		// TODO Auto-generated method stub
-		System.out.println("inserting branch...");
+	private void insertItem() 
+	{
+		String             upc;
+		String             sellPrice;
+		String             stock;
+		String             taxable;
+		//int                bphone;
+		PreparedStatement  ps;
+		  
+		try
+		{
+		  ps = con.prepareStatement("INSERT INTO item VALUES (?,?,?,?)");
 		
-	}
+		  System.out.print("\nUpc: ");
+		  upc = in.readLine();
+		  ps.setString(1, upc);
+
+		  System.out.print("\nSelling Price: ");
+		  sellPrice = in.readLine();
+		  ps.setString(2, sellPrice);
+
+		  System.out.print("\nStock: ");
+		  stock = in.readLine();
+		  ps.setString(3, stock);
+		  
+//		  if (baddr.length() == 0)
+//	          {
+//		      ps.setString(3, null);
+//		  }
+//		  else
+//		  {
+//		      ps.setString(3, baddr);
+//		  }
+		 
+		  System.out.print("\nTaxable (y/n): ");
+		  taxable = in.readLine();
+		  ps.setString(4, taxable);
+
+//		  System.out.print("\nBranch Phone: ");
+//		  String phoneTemp = in.readLine();
+//		  if (phoneTemp.length() == 0)
+//		  {
+//		      ps.setNull(5, java.sql.Types.INTEGER);
+//		  }
+//		  else
+//		  {
+//		      bphone = Integer.parseInt(phoneTemp);
+//		      ps.setInt(5, bphone);
+//		  }
+
+		  ps.executeUpdate();
+
+		  // commit work 
+		  con.commit();
+
+		  ps.close();
+		}
+		catch (IOException e)
+		{
+		    System.out.println("IOException!");
+		}
+		catch (SQLException ex)
+		{
+		    System.out.println("Message: " + ex.getMessage());
+		    try 
+		    {
+			// undo the insert
+			con.rollback();	
+		    }
+		    catch (SQLException ex2)
+		    {
+			System.out.println("Message: " + ex2.getMessage());
+			System.exit(-1);
+		    }
+		}
+	    }
 
 	public static void main(String args[])
 	    {
