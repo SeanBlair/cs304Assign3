@@ -34,6 +34,8 @@ public class bookstore implements ActionListener{
 		 
 		 connect();
 		 System.out.println("connected!!???");
+		 
+		 showMenu();
 		
 	}
 	
@@ -61,7 +63,91 @@ public class bookstore implements ActionListener{
 		
 	}
 	
-	 public static void main(String args[])
+	
+	private void showMenu()
+    {
+	int choice;
+	boolean quit;
+
+	quit = false;
+	
+	try 
+	{
+	    // disable auto commit mode
+	    con.setAutoCommit(false);
+
+	    while (!quit)
+	    {
+		System.out.print("\n\nPlease choose one of the following: \n");
+		System.out.print("1.  Insert branch\n");
+		System.out.print("2.  Delete branch\n");
+		System.out.print("3.  Update branch\n");
+		System.out.print("4.  Show branch\n");
+		System.out.print("5.  Quit\n>> ");
+
+		choice = Integer.parseInt(in.readLine());
+		
+		System.out.println(" ");
+
+		switch(choice)
+		{
+		   case 1:  insertBranch(); break;
+		   case 2:  deleteBranch(); break;
+		   case 3:  updateBranch(); break;
+		   case 4:  showBranch(); break;
+		   case 5:  quit = true;
+		}
+	    }
+
+	    con.close();
+            in.close();
+	    System.out.println("\nGood Bye!\n\n");
+	    System.exit(0);
+	}
+	catch (IOException e)
+	{
+	    System.out.println("IOException!");
+
+	    try
+	    {
+		con.close();
+		System.exit(-1);
+	    }
+	    catch (SQLException ex)
+	    {
+		 System.out.println("Message: " + ex.getMessage());
+	    }
+	}
+	catch (SQLException ex)
+	{
+	    System.out.println("Message: " + ex.getMessage());
+	}
+    }
+	
+	 private void showBranch() {
+		// TODO Auto-generated method stub
+		 System.out.println("showing branch...");
+		
+	}
+
+	private void updateBranch() {
+		// TODO Auto-generated method stub
+		System.out.println("updating branch...");
+		
+	}
+
+	private void deleteBranch() {
+		// TODO Auto-generated method stub
+		System.out.println("deleting branch...");
+	}
+
+	private void insertBranch() {
+		// TODO Auto-generated method stub
+		System.out.println("inserting branch...");
+		
+	}
+
+	public static void main(String args[])
 	    {
 	      bookstore b = new bookstore();
 	      
