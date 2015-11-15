@@ -210,10 +210,49 @@ public class bookstore implements ActionListener{
 		
 	}
 
-	private void removeItem() {
-		// TODO Auto-generated method stub
-		System.out.println("deleting branch...");
-	}
+	private void removeItem() 
+	{
+		int                bid;
+		PreparedStatement  ps;
+		  
+		try
+		{
+		  ps = con.prepareStatement("DELETE FROM branch WHERE branch_id = ?");
+		
+		  System.out.print("\nBranch ID: ");
+		  bid = Integer.parseInt(in.readLine());
+		  ps.setInt(1, bid);
+
+		  int rowCount = ps.executeUpdate();
+
+		  if (rowCount == 0)
+		  {
+		      System.out.println("\nBranch " + bid + " does not exist!");
+		  }
+
+		  con.commit();
+
+		  ps.close();
+		}
+		catch (IOException e)
+		{
+		    System.out.println("IOException!");
+		}
+		catch (SQLException ex)
+		{
+		    System.out.println("Message: " + ex.getMessage());
+
+	            try 
+		    {
+			con.rollback();	
+		    }
+		    catch (SQLException ex2)
+		    {
+			System.out.println("Message: " + ex2.getMessage());
+			System.exit(-1);
+		    }
+		}
+	    }
 
 	private void insertItem() 
 	{
@@ -221,7 +260,6 @@ public class bookstore implements ActionListener{
 		String             sellPrice;
 		String             stock;
 		String             taxable;
-		//int                bphone;
 		PreparedStatement  ps;
 		  
 		try
@@ -239,31 +277,10 @@ public class bookstore implements ActionListener{
 		  System.out.print("\nStock: ");
 		  stock = in.readLine();
 		  ps.setString(3, stock);
-		  
-//		  if (baddr.length() == 0)
-//	          {
-//		      ps.setString(3, null);
-//		  }
-//		  else
-//		  {
-//		      ps.setString(3, baddr);
-//		  }
 		 
 		  System.out.print("\nTaxable (y/n): ");
 		  taxable = in.readLine();
 		  ps.setString(4, taxable);
-
-//		  System.out.print("\nBranch Phone: ");
-//		  String phoneTemp = in.readLine();
-//		  if (phoneTemp.length() == 0)
-//		  {
-//		      ps.setNull(5, java.sql.Types.INTEGER);
-//		  }
-//		  else
-//		  {
-//		      bphone = Integer.parseInt(phoneTemp);
-//		      ps.setInt(5, bphone);
-//		  }
 
 		  ps.executeUpdate();
 
@@ -291,6 +308,8 @@ public class bookstore implements ActionListener{
 		    }
 		}
 	    }
+	
+	
 
 	public static void main(String args[])
 	    {
