@@ -80,7 +80,8 @@ public class bookstore implements ActionListener{
 		System.out.print("2.  Remove Item\n");
 		System.out.print("3.  List popular textbooks running low\n");
 		System.out.print("4.  List top 3 selling items last week\n");
-		System.out.print("5.  Quit\n>> ");
+		System.out.print("5.  Show item relation\n");
+		System.out.print("6.  Quit\n>> ");
 
 		choice = Integer.parseInt(in.readLine());
 		
@@ -92,7 +93,8 @@ public class bookstore implements ActionListener{
 		   case 2:  removeItem(); break;
 		   case 3:  listLowPopularTextbooks(); break;
 		   case 4:  list3TopSellingItems(); break;
-		   case 5:  quit = true;
+		   case 5:  showItem(); break;
+		   case 6:  quit = true;
 		}
 	    }
 
@@ -293,6 +295,7 @@ public class bookstore implements ActionListener{
 			System.exit(-1);
 		    }
 		}
+		showItem();
 	    }
 
 	private void insertItem() 
@@ -353,6 +356,75 @@ public class bookstore implements ActionListener{
 			System.exit(-1);
 		    }
 		}
+		showItem();
+	    }
+	
+	
+	
+	 private void showItem()
+	    {
+		String     upc;
+		String     sellingPrice;
+		String     stock;
+		String     taxable;
+		//String     bphone;
+		Statement  stmt;
+		ResultSet  rs;
+		   
+		try
+		{
+		  stmt = con.createStatement();
+
+		  rs = stmt.executeQuery("SELECT * FROM item");
+
+		  // get info on ResultSet
+		  ResultSetMetaData rsmd = rs.getMetaData();
+
+		  // get number of columns
+		  int numCols = rsmd.getColumnCount();
+
+		  System.out.println(" ");
+		  
+		  // display column names;
+		  for (int i = 0; i < numCols; i++)
+		  {
+		      // get column name and print it
+
+		      System.out.printf("%-15s", rsmd.getColumnName(i+1));    
+		  }
+
+		  System.out.println(" ");
+
+		  while(rs.next())
+		  {
+		      // for display purposes get everything from Oracle 
+		      // as a string
+
+		      // simplified output formatting; truncation may occur
+
+		      upc = rs.getString("upc");
+		      System.out.printf("%-10.10s", upc);
+
+		      sellingPrice = rs.getString("sellingPrice");
+		      System.out.printf("%-20.20s", sellingPrice);
+
+		      stock = rs.getString("stock");
+		      System.out.printf("%-20.20s", stock);
+		      
+
+		      taxable = rs.getString("taxable");
+		      System.out.printf("%-15.15s\n", taxable);
+		      
+		  }
+	 
+		  // close the statement; 
+		  // the ResultSet will also be closed
+		  stmt.close();
+		}
+		catch (SQLException ex)
+		{
+		    System.out.println("Message: " + ex.getMessage());
+		}	
 	    }
 	
 	
