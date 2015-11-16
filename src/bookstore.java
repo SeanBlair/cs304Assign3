@@ -257,14 +257,32 @@ public class bookstore implements ActionListener{
 	{
 		String                upc;
 		PreparedStatement  ps;
+		PreparedStatement psA;
+		
 		  
 		try
 		{
+			
+			//
+			psA = con.prepareStatement("select * from item where stock > 0 and upc = ?");
+			
 		  ps = con.prepareStatement("DELETE FROM item WHERE upc = ?");
 		
 		  System.out.print("\nUpc: ");
 		  upc = in.readLine();
 		  ps.setString(1, upc);
+		  
+		  //
+		  psA.setString(1, upc);
+		  int count = psA.executeUpdate();
+		  if(count == 1){
+			  showItem();
+			  System.out.println("\nItem " + upc + " has positive stock");
+			  return;
+		  }
+		  //////
+		      
+		      ////////
 
 		  int rowCount = ps.executeUpdate();
 
