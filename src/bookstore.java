@@ -124,9 +124,6 @@ public class bookstore implements ActionListener{
 	 private void list3TopSellingItems() {
 			String     upc;
 			String     totalSales;
-//			String     baddr;
-//			String     bcity;
-//			String     bphone;
 			Statement  stmt;
 			ResultSet  rs;
 			   
@@ -175,28 +172,6 @@ public class bookstore implements ActionListener{
 			      totalSales = rs.getString("totalSales");
 			      System.out.printf("%-20.20s\n", totalSales);
 
-//			      baddr = rs.getString("branch_addr");
-//			      if (rs.wasNull())
-//			      {
-//			    	  System.out.printf("%-20.20s", " ");
-//		              }
-//			      else
-//			      {
-//			    	  System.out.printf("%-20.20s", baddr);
-//			      }
-//
-//			      bcity = rs.getString("branch_city");
-//			      System.out.printf("%-15.15s", bcity);
-//
-//			      bphone = rs.getString("branch_phone");
-//			      if (rs.wasNull())
-//			      {
-//			    	  System.out.printf("%-15.15s\n", " ");
-//		              }
-//			      else
-//			      {
-//			    	  System.out.printf("%-15.15s\n", bphone);
-//			      }  
 			      count++;
 			  }
 		 
@@ -361,7 +336,12 @@ public class bookstore implements ActionListener{
 		}
 		catch (SQLException ex)
 		{
+			//if(ex.getMessage().contains("ORA-00001")){
+			if(ex.getErrorCode() == 1){
+				System.out.println("ERROR: The UPC already exists in the database!!");
+			}else{
 		    System.out.println("Message: " + ex.getMessage());
+			}
 		    try 
 		    {
 			// undo the insert
