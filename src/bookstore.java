@@ -79,7 +79,7 @@ public class bookstore implements ActionListener{
 		System.out.print("1.  Insert Item\n");
 		System.out.print("2.  Remove Item\n");
 		System.out.print("3.  List popular textbooks running low\n");
-		System.out.print("4.  Show branch\n");
+		System.out.print("4.  List top 3 selling items last week\n");
 		System.out.print("5.  Quit\n>> ");
 
 		choice = Integer.parseInt(in.readLine());
@@ -91,7 +91,7 @@ public class bookstore implements ActionListener{
 		   case 1:  insertItem(); break;
 		   case 2:  removeItem(); break;
 		   case 3:  listLowPopularTextbooks(); break;
-		   case 4:  showBranch(); break;
+		   case 4:  list3TopSellingItems(); break;
 		   case 5:  quit = true;
 		}
 	    }
@@ -121,20 +121,26 @@ public class bookstore implements ActionListener{
 	}
     }
 	
-	 private void showBranch() {
-			String     bid;
-			String     bname;
-			String     baddr;
-			String     bcity;
-			String     bphone;
+	 private void list3TopSellingItems() {
+			String     upc;
+			String     totalSales;
+//			String     baddr;
+//			String     bcity;
+//			String     bphone;
 			Statement  stmt;
 			ResultSet  rs;
 			   
 			try
 			{
 			  stmt = con.createStatement();
+			  
+			  String query = "with temp(upc, total) as (select IP.upc, sum(IP.quantity) as total "
+			  		+ "from purchase P, itemPurchase IP where P.purchaseDate >= '15-10-25' "
+			  		+ "and P.purchaseDate <= '15-10-31' group by IP.upc) "
+			  		+ "select temp.upc, temp.total * I.sellingPrice as totalSales "
+			  		+ "from temp, item I where I.upc = temp.upc order by totalSales desc";
 
-			  rs = stmt.executeQuery("SELECT * FROM branch");
+			  rs = stmt.executeQuery(query);
 
 			  // get info on ResultSet
 			  ResultSetMetaData rsmd = rs.getMetaData();
@@ -153,42 +159,45 @@ public class bookstore implements ActionListener{
 			  }
 
 			  System.out.println(" ");
-
-			  while(rs.next())
+			  
+			  int count = 0;
+			  
+			  while(rs.next()&& count < 3)
 			  {
 			      // for display purposes get everything from Oracle 
 			      // as a string
 
 			      // simplified output formatting; truncation may occur
 
-			      bid = rs.getString("branch_id");
-			      System.out.printf("%-10.10s", bid);
+			      upc = rs.getString("upc");
+			      System.out.printf("%-10.10s", upc);
 
-			      bname = rs.getString("branch_name");
-			      System.out.printf("%-20.20s", bname);
+			      totalSales = rs.getString("totalSales");
+			      System.out.printf("%-20.20s\n", totalSales);
 
-			      baddr = rs.getString("branch_addr");
-			      if (rs.wasNull())
-			      {
-			    	  System.out.printf("%-20.20s", " ");
-		              }
-			      else
-			      {
-			    	  System.out.printf("%-20.20s", baddr);
-			      }
-
-			      bcity = rs.getString("branch_city");
-			      System.out.printf("%-15.15s", bcity);
-
-			      bphone = rs.getString("branch_phone");
-			      if (rs.wasNull())
-			      {
-			    	  System.out.printf("%-15.15s\n", " ");
-		              }
-			      else
-			      {
-			    	  System.out.printf("%-15.15s\n", bphone);
-			      }      
+//			      baddr = rs.getString("branch_addr");
+//			      if (rs.wasNull())
+//			      {
+//			    	  System.out.printf("%-20.20s", " ");
+//		              }
+//			      else
+//			      {
+//			    	  System.out.printf("%-20.20s", baddr);
+//			      }
+//
+//			      bcity = rs.getString("branch_city");
+//			      System.out.printf("%-15.15s", bcity);
+//
+//			      bphone = rs.getString("branch_phone");
+//			      if (rs.wasNull())
+//			      {
+//			    	  System.out.printf("%-15.15s\n", " ");
+//		              }
+//			      else
+//			      {
+//			    	  System.out.printf("%-15.15s\n", bphone);
+//			      }  
+			      count++;
 			  }
 		 
 			  // close the statement; 
