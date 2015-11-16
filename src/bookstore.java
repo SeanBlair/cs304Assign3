@@ -133,7 +133,13 @@ public class bookstore implements ActionListener{
 			{
 			  stmt = con.createStatement();
 			  
-			  String query = "with temp(upc, total) as (select IP.upc, sum(IP.quantity) as total "
+			  String query = "select I.upc, sum(IP.quantity * I.sellingPrice) as totalSales "
+			  		+ "from item I, itemPurchase IP, purchase P where I.upc = IP.upc "
+			  		+ "and P.t_id = IP.t_id and P.purchaseDate >= '15-10-25' and "
+			  		+ "P.purchaseDate <= '15-10-31' group by I.upc order by totalSales desc";
+
+			  
+			  String queryWrong = "with temp(upc, total) as (select IP.upc, sum(IP.quantity) as total "
 			  		+ "from purchase P, itemPurchase IP where P.purchaseDate >= '15-10-25' "
 			  		+ "and P.purchaseDate <= '15-10-31' group by IP.upc) "
 			  		+ "select temp.upc, temp.total * I.sellingPrice as totalSales "
@@ -263,7 +269,7 @@ public class bookstore implements ActionListener{
 		try
 		{
 			
-			//
+			
 			psA = con.prepareStatement("select * from item where stock > 0 and upc = ?");
 			
 		  ps = con.prepareStatement("DELETE FROM item WHERE upc = ?");
@@ -277,7 +283,7 @@ public class bookstore implements ActionListener{
 		  int count = psA.executeUpdate();
 		  if(count == 1){
 			  showItem();
-			  System.out.println("\nItem " + upc + " has positive stock");
+			  System.out.println("\nItem " + upc + " has positive stock \nCancelled!");
 			  return;
 		  }
 		  //////
