@@ -16,15 +16,13 @@ public class bookstore implements ActionListener{
 	
 	
 	
-	public bookstore(){
-		System.out.println("yey, new bookstore!!");	
+	public bookstore(){	
 		
 		 try 
 	      {
 		// Load the Oracle JDBC driver
 		DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
 		
-		System.out.println("oracle ldbc driver loaded..");
 	      }
 	      catch (SQLException ex)
 	      {
@@ -33,7 +31,6 @@ public class bookstore implements ActionListener{
 	      }
 		 
 		 connect();
-		 System.out.println("connected!!???");
 		 
 		 showMenu();
 		
@@ -81,7 +78,7 @@ public class bookstore implements ActionListener{
 		System.out.print("\n\nPlease choose one of the following: \n");
 		System.out.print("1.  Insert Item\n");
 		System.out.print("2.  Remove Item\n");
-		System.out.print("3.  Update branch\n");
+		System.out.print("3.  List popular textbooks running low\n");
 		System.out.print("4.  Show branch\n");
 		System.out.print("5.  Quit\n>> ");
 
@@ -93,7 +90,7 @@ public class bookstore implements ActionListener{
 		{
 		   case 1:  insertItem(); break;
 		   case 2:  removeItem(); break;
-		   case 3:  updateBranch(); break;
+		   case 3:  listLowPopularTextbooks(); break;
 		   case 4:  showBranch(); break;
 		   case 5:  quit = true;
 		}
@@ -204,11 +201,71 @@ public class bookstore implements ActionListener{
 			}	
 		    }
 
-	private void updateBranch() {
-		// TODO Auto-generated method stub
-		System.out.println("updating branch...");
-		
+	private void listLowPopularTextbooks()
+	{
+	String     upc;
+	String     bname;
+	//String     baddr;
+	//String     bcity;
+	//String     bphone;
+	Statement  stmt;
+	ResultSet  rs;
+	   
+	try
+	{
+	  stmt = con.createStatement();
+	  
+	  String query = "select B.upc, B.title from book B, item I where B.upc = I.upc "
+	  		+ "and I.stock < 10 and B.flag_text = 'y' and B.upc in "
+	  		+ "(select IP.upc from purchase P, itemPurchase IP "
+	  		+ "where P.purchaseDate >= '15-10-25' and P.purchaseDate <= '15-10-31' "
+	  		+ "group by IP.upc having sum(IP.quantity) > 50)";
+
+	  rs = stmt.executeQuery(query);
+
+	  // get info on ResultSet
+	  ResultSetMetaData rsmd = rs.getMetaData();
+
+	  // get number of columns
+	  int numCols = rsmd.getColumnCount();
+
+	  System.out.println(" ");
+	  
+	  // display column names;
+	  for (int i = 0; i < numCols; i++)
+	  {
+	      // get column name and print it
+
+	      System.out.printf("%-15s", rsmd.getColumnName(i+1));    
+	  }
+
+	  System.out.println(" ");
+
+	  while(rs.next())
+	  {
+	      // for display purposes get everything from Oracle 
+	      // as a string
+
+	      // simplified output formatting; truncation may occur
+
+	      upc = rs.getString("upc");
+	      System.out.printf("%-10.10s", upc);
+
+	      bname = rs.getString("title");
+	      System.out.printf("%-60.60s\n", bname);
+
+	  }
+ 
+	  // close the statement; 
+	  // the ResultSet will also be closed
+	  stmt.close();
 	}
+	catch (SQLException ex)
+	{
+	    System.out.println("Message: " + ex.getMessage());
+	}	
+    }
+	
 
 	private void removeItem() 
 	{
