@@ -197,9 +197,7 @@ public class bookstore implements ActionListener{
 	{
 	String     upc;
 	String     bname;
-	//String     baddr;
-	//String     bcity;
-	//String     bphone;
+
 	Statement  stmt;
 	ResultSet  rs;
 	   
@@ -365,7 +363,8 @@ public class bookstore implements ActionListener{
 		{
 			//if(ex.getMessage().contains("ORA-00001")){
 			if(ex.getErrorCode() == 1){
-				System.out.println("ERROR: The UPC already exists in the database!!");
+				showItem();
+				System.out.println("\n\nERROR: The UPC already exists in the database!!");
 			}else{
 		    System.out.println("Message: " + ex.getMessage());
 			}
@@ -380,7 +379,7 @@ public class bookstore implements ActionListener{
 			System.exit(-1);
 		    }
 		}
-		showItem();
+		
 	    }
 	
 	
