@@ -138,12 +138,6 @@ public class bookstore implements ActionListener{
 			  		+ "and P.t_id = IP.t_id and P.purchaseDate >= '15-10-25' and "
 			  		+ "P.purchaseDate <= '15-10-31' group by I.upc order by totalSales desc";
 
-			  
-			  String queryWrong = "with temp(upc, total) as (select IP.upc, sum(IP.quantity) as total "
-			  		+ "from purchase P, itemPurchase IP where P.purchaseDate >= '15-10-25' "
-			  		+ "and P.purchaseDate <= '15-10-31' group by IP.upc) "
-			  		+ "select temp.upc, temp.total * I.sellingPrice as totalSales "
-			  		+ "from temp, item I where I.upc = temp.upc order by totalSales desc";
 
 			  rs = stmt.executeQuery(query);
 
@@ -260,10 +254,11 @@ public class bookstore implements ActionListener{
 	private void removeItem() 
 	{
 		String                upc;
-		PreparedStatement  ps;
-		PreparedStatement psA;
-		
-		  
+		PreparedStatement     ps;
+		PreparedStatement     psA;
+		PreparedStatement     psB;
+		PreparedStatement     psC; 
+		PreparedStatement     psD;
 		try
 		{
 			
@@ -271,6 +266,11 @@ public class bookstore implements ActionListener{
 			psA = con.prepareStatement("select * from item where stock > 0 and upc = ?");
 			
 		  ps = con.prepareStatement("DELETE FROM item WHERE upc = ?");
+		  
+		  psB = con.prepareStatement("delete from book where upc = ?");
+		  psC = con.prepareStatement("delete from itemPurchase where upc = ?");
+		  psD = con.prepareStatement("delete from purchase where t_id = "
+		  		+ "(select t_id from itemPurchase where upc = ?)");
 		
 		  System.out.print("\nUpc: ");
 		  upc = in.readLine();
@@ -278,23 +278,38 @@ public class bookstore implements ActionListener{
 		  
 		  //
 		  psA.setString(1, upc);
+		  psB.setString(1, upc);
+		  psC.setString(1, upc);
+		  psD.setString(1, upc);
+		  
 		  int count = psA.executeUpdate();
 		  if(count == 1){
 			  showItem();
 			  System.out.println("\nItem " + upc + " has positive stock \nCancelled!");
 			  return;
 		  }
-		  //////
-		      
-		      ////////
-
+		
+		  
+//		  int x = psD.executeUpdate();
+//		  con.commit();
+		  int y = psC.executeUpdate();
+		  con.commit();
+		  int z = psB.executeUpdate();
+		  con.commit();
+		  
 		  int rowCount = ps.executeUpdate();
 
 		  if (rowCount == 0)
 		  {
 		      System.out.println("\nItem " + upc + " does not exist!");
+		  }else{
+//			  int x = psD.executeUpdate();
+//			  con.commit();
+//			  int y = psC.executeUpdate();
+//			  con.commit();
+//			  int z = psB.executeUpdate();
 		  }
-
+		  
 		  con.commit();
 
 		  ps.close();
